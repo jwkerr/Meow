@@ -1,0 +1,6 @@
+name: Meow
+version: '${project.version}'
+main: com.fwloopins.meow.Meow
+api-version: '1.19'
+authors: [Fruitloopins]
+description: Allow players to meow
