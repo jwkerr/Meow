@@ -1,6 +1,57 @@
 name: Meow
-version: '${project.version}'
+version: "${project.version}"
 main: com.fwloopins.meow.Meow
-api-version: '1.19'
+api-version: "1.19"
 authors: [Fruitloopins]
 description: Allow players to meow
+folia-supported: true
+
+commands:
+  meow:
+    description: "Play cat sounds"
+    usage: "/meow {sound}"
+    permission: "meow.command.meow"
+
+permissions:
+  meow.particles:
+    description: "Grants permission to have particles appear when using certain sounds"
+    default: true
+
+  meow.command.meow:
+    description: "Grants permission to use the meow command"
+    default: true
+
+  meow.command.meow.*:
+    description: "Grants permission to all meow command sounds"
+    default: true
+    children:
+      meow.command.meow.beg: true
+      meow.command.meow.hiss: true
+      meow.command.meow.hurt: true
+      meow.command.meow.meow: true
+      meow.command.meow.purr: true
+      meow.command.meow.purreow: true
+
+  meow.command.meow.beg:
+    description: "Grants permission to use the beg sound"
+    default: true
+
+  meow.command.meow.hiss:
+    description: "Grants permission to use the hiss sound"
+    default: true
+
+  meow.command.meow.hurt:
+    description: "Grants permission to use the hurt sound"
+    default: true
+
+  meow.command.meow.meow:
+    description: "Grants permission to use the meow sound"
+    default: true
+
+  meow.command.meow.purr:
+    description: "Grants permission to use the purr sound"
+    default: true
+
+  meow.command.meow.purreow:
+    description: "Grants permission to use the purreow sound"
+    default: true
