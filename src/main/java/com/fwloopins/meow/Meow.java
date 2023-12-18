@@ -15,7 +15,9 @@ public final class Meow extends JavaPlugin {
         Config.init(getConfig());
         saveConfig();
 
-        CooldownManager.initCooldownTask();
+        if (getConfig().getBoolean("cooldowns.enabled"))
+            CooldownManager.initCooldownTask();
+
         getCommand("meow").setExecutor(new MeowCommand());
     }
 }

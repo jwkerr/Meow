@@ -11,6 +11,7 @@ import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,15 +30,18 @@ public class MeowCommand implements TabExecutor {
             return true;
         }
 
+        FileConfiguration config = Meow.INSTANCE.getConfig();
         final long currentTime = Instant.now().getEpochSecond();
-        final Long lastExecutionTime = CooldownManager.commandCooldowns.getOrDefault(player.getUniqueId(), null);
-        if (lastExecutionTime != null) {
-            final long timeSinceExecution = currentTime - lastExecutionTime;
-            final long cooldownTime = Meow.INSTANCE.getConfig().getLong("cooldowns.cooldown_seconds");
-            if (timeSinceExecution < cooldownTime) {
-                final long timeRemaining = cooldownTime - timeSinceExecution;
-                player.sendMessage(Component.text("You must wait " + timeRemaining + " seconds to use this command again", NamedTextColor.RED));
-                return true;
+        if (config.getBoolean("cooldowns.enabled")) {
+            final Long lastExecutionTime = CooldownManager.commandCooldowns.getOrDefault(player.getUniqueId(), null);
+            if (lastExecutionTime != null) {
+                final long timeSinceExecution = currentTime - lastExecutionTime;
+                final long cooldownTime = config.getLong("cooldowns.cooldown_seconds");
+                if (timeSinceExecution < cooldownTime) {
+                    final long timeRemaining = cooldownTime - timeSinceExecution;
+                    player.sendMessage(Component.text("You must wait " + timeRemaining + " seconds to use this command again", NamedTextColor.RED));
+                    return true;
+                }
             }
         }
 
@@ -85,7 +89,9 @@ public class MeowCommand implements TabExecutor {
                 return true;
         }
 
-        CooldownManager.commandCooldowns.put(player.getUniqueId(), currentTime);
+        if (config.getBoolean("cooldowns.enabled"))
+            CooldownManager.commandCooldowns.put(player.getUniqueId(), currentTime);
+
         return true;
     }
 
