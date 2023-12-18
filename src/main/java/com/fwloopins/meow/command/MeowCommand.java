@@ -1,5 +1,7 @@
 package com.fwloopins.meow.command;
 
+import com.fwloopins.meow.Meow;
+import com.fwloopins.meow.manager.CooldownManager;
 import com.fwloopins.meow.util.CommandUtil;
 import com.fwloopins.meow.util.ParticleUtil;
 import com.fwloopins.meow.util.SoundUtil;
@@ -13,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,9 +29,22 @@ public class MeowCommand implements TabExecutor {
             return true;
         }
 
+        final long currentTime = Instant.now().getEpochSecond();
+        final Long lastExecutionTime = CooldownManager.commandCooldowns.getOrDefault(player.getUniqueId(), null);
+        if (lastExecutionTime != null) {
+            final long timeSinceExecution = currentTime - lastExecutionTime;
+            final long cooldownTime = Meow.INSTANCE.getConfig().getLong("cooldowns.cooldown_seconds");
+            if (timeSinceExecution < cooldownTime) {
+                final long timeRemaining = cooldownTime - timeSinceExecution;
+                player.sendMessage(Component.text("You must wait " + timeRemaining + " seconds to use this command again", NamedTextColor.RED));
+                return true;
+            }
+        }
+
         if (args.length == 0) {
             if (!CommandUtil.hasPermissionOrError(player, "meow.command.meow.meow")) return true;
             SoundUtil.playMeowAtPlayer(player);
+            CooldownManager.commandCooldowns.put(player.getUniqueId(), currentTime);
             return true;
         }
 
@@ -69,6 +85,7 @@ public class MeowCommand implements TabExecutor {
                 return true;
         }
 
+        CooldownManager.commandCooldowns.put(player.getUniqueId(), currentTime);
         return true;
     }
 
