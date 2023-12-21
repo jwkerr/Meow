@@ -7,6 +7,7 @@ import com.fwloopins.meow.util.ParticleUtil;
 import com.fwloopins.meow.util.SoundUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.GameMode;
 import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,6 +28,11 @@ public class MeowCommand implements TabExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
             sender.sendMessage(Component.text("Only players can use this command", NamedTextColor.RED));
+            return true;
+        }
+
+        if (player.getGameMode().equals(GameMode.SPECTATOR)) {
+            player.sendMessage(Component.text("Spectators cannot use this command", NamedTextColor.RED));
             return true;
         }
 
