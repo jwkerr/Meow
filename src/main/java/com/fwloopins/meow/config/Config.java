@@ -10,7 +10,7 @@ public class Config {
         config.options().setHeader(Collections.singletonList("Meow"));
 
         config.addDefault("cooldowns.enabled", true);
-        config.addDefault("cooldowns.cooldown_seconds", 180);
+        config.addDefault("cooldowns.cooldown_seconds", 30);
 
         config.options().copyDefaults(true);
     }
