@@ -17,6 +17,10 @@ permissions:
     description: "Grants permission to have particles appear when using certain sounds"
     default: true
 
+  meow.cooldowns.exempt:
+    description: "Grants an exemption from meow command cooldowns"
+    default: false
+
   meow.command.meow:
     description: "Grants permission to use the meow command"
     default: true

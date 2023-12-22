@@ -38,7 +38,7 @@ public class MeowCommand implements TabExecutor {
 
         FileConfiguration config = Meow.INSTANCE.getConfig();
         final long currentTime = Instant.now().getEpochSecond();
-        if (config.getBoolean("cooldowns.enabled")) {
+        if (config.getBoolean("cooldowns.enabled") && !player.hasPermission("meow.cooldowns.exempt")) {
             final Long lastExecutionTime = CooldownManager.commandCooldowns.getOrDefault(player.getUniqueId(), null);
             if (lastExecutionTime != null) {
                 final long timeSinceExecution = currentTime - lastExecutionTime;
