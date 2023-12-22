@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MeowCommand implements TabExecutor {
@@ -38,7 +39,7 @@ public class MeowCommand implements TabExecutor {
 
         FileConfiguration config = Meow.INSTANCE.getConfig();
         final long currentTime = Instant.now().getEpochSecond();
-        if (config.getBoolean("cooldowns.enabled") && !player.hasPermission("meow.cooldowns.exempt")) {
+        if (config.getBoolean("cooldowns.enabled") && !CommandUtil.isPlayerExemptFromCooldowns(player)) {
             final Long lastExecutionTime = CooldownManager.commandCooldowns.getOrDefault(player.getUniqueId(), null);
             if (lastExecutionTime != null) {
                 final long timeSinceExecution = currentTime - lastExecutionTime;
