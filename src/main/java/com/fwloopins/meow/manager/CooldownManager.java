@@ -4,33 +4,24 @@ import com.fwloopins.meow.Meow;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class CooldownManager {
     public static HashMap<UUID, Long> commandCooldowns = new HashMap<>();
 
-    public static void initCooldownTask() {
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    public static boolean hasCooldown(UUID uuid) {
+        long cooldownSeconds = Meow.INSTANCE.getConfig().getLong("cooldowns.cooldown_seconds");
+        Long value = commandCooldowns.getOrDefault(uuid, null);
 
-        Runnable task = () -> {
-            Iterator<Map.Entry<UUID, Long>> iterator = commandCooldowns.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<UUID, Long> entry = iterator.next();
-                final long currentTime = Instant.now().getEpochSecond();
-                final long lastExecutionTime = entry.getValue();
-                final long cooldownSeconds = Meow.INSTANCE.getConfig().getLong("cooldowns.cooldown_seconds");
+        return value != null && Instant.now().getEpochSecond() - value < cooldownSeconds;
+    }
 
-                if (currentTime - lastExecutionTime >= cooldownSeconds) {
-                    iterator.remove();
-                }
-            }
-        };
+    public static Long getCooldownSeconds(UUID uuid) {
+        Long value = commandCooldowns.getOrDefault(uuid, null);
+        if (value == null) return null;
 
-        executor.scheduleAtFixedRate(task, 0, 1, TimeUnit.SECONDS);
+        long cooldownSeconds = Meow.INSTANCE.getConfig().getLong("cooldowns.cooldown_seconds");
+        long targetTime = value + cooldownSeconds;
+        return targetTime - Instant.now().getEpochSecond();
     }
 }

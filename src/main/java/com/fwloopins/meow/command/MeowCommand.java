@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MeowCommand implements TabExecutor {
@@ -38,24 +37,18 @@ public class MeowCommand implements TabExecutor {
         }
 
         FileConfiguration config = Meow.INSTANCE.getConfig();
-        final long currentTime = Instant.now().getEpochSecond();
+
         if (config.getBoolean("cooldowns.enabled") && !CommandUtil.isPlayerExemptFromCooldowns(player)) {
-            final Long lastExecutionTime = CooldownManager.commandCooldowns.getOrDefault(player.getUniqueId(), null);
-            if (lastExecutionTime != null) {
-                final long timeSinceExecution = currentTime - lastExecutionTime;
-                final long cooldownTime = config.getLong("cooldowns.cooldown_seconds");
-                if (timeSinceExecution < cooldownTime) {
-                    final long timeRemaining = cooldownTime - timeSinceExecution;
-                    player.sendMessage(Component.text("You must wait " + timeRemaining + " seconds to use this command again", NamedTextColor.RED));
-                    return true;
-                }
+            if (CooldownManager.hasCooldown(player.getUniqueId())) {
+                player.sendMessage(Component.text("You must wait " + CooldownManager.getCooldownSeconds(player.getUniqueId()) + " before using this command again", NamedTextColor.RED));
+                return true;
             }
         }
 
         if (args.length == 0) {
             if (!CommandUtil.hasPermissionOrError(player, "meow.command.meow.meow")) return true;
             SoundUtil.playMeowAtPlayer(player);
-            CooldownManager.commandCooldowns.put(player.getUniqueId(), currentTime);
+            CooldownManager.commandCooldowns.put(player.getUniqueId(), Instant.now().getEpochSecond());
             return true;
         }
 
@@ -97,7 +90,7 @@ public class MeowCommand implements TabExecutor {
         }
 
         if (config.getBoolean("cooldowns.enabled"))
-            CooldownManager.commandCooldowns.put(player.getUniqueId(), currentTime);
+            CooldownManager.commandCooldowns.put(player.getUniqueId(), Instant.now().getEpochSecond());
 
         return true;
     }
